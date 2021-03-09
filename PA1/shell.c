@@ -105,7 +105,6 @@ int shellSummond(char **args)
   return 1;
 }
 
-
 /**
  * Allows one to check daemon process
  * 
@@ -174,7 +173,6 @@ int shellExit(char **args)
 {
   return 0;
 }
-
 
 /*
   Builtin function implementations.
@@ -272,7 +270,23 @@ char *shellReadLine(void)
   // 3. Fetch an entire line from input stream stdin using getline() function. getline() will store user input onto the memory location allocated in (1)
   // 4. Return the char*
 
-  return NULL;
+  // task 1.1 - create malloc for input
+  char *buffer = malloc(sizeof(char) * SHELL_BUFFERSIZE);
+
+  // task 1.2 - check that malloc is not NULL
+  if (buffer == NULL)
+  {
+    printf("malloc created returns NULL :c");
+    return NULL; // fail
+  }
+
+  // task 1.3 - getline()
+  // expected ‘size_t * restrict’
+  size_t shell_buffersize_size_t = SHELL_BUFFERSIZE;
+  getline(&buffer, &shell_buffersize_size_t, stdin);
+
+  // 1.4 return malloc
+  return buffer;
 }
 
 /**
@@ -287,8 +301,33 @@ char **shellTokenizeInput(char *line)
   // 2. Check that char ** that is returend by malloc is not NULL
   // 3. Tokenize the *line using strtok() function
   // 4. Return the char **
+  char *shell_input_delim = SHELL_INPUT_DELIM;
+  char **token_positions = malloc(sizeof(char *) * SHELL_BUFFERSIZE);
+  char *token = strtok(line, shell_input_delim);
+  int index = 0;
+  token_positions[index] = token;
+  index++;
 
-  return NULL;
+  while (token != NULL)
+  {
+    // Tokenize the rest of the
+    token = strtok(NULL, shell_input_delim);
+    token_positions[index] = token; //store the position index++;
+    index++;
+    //continue finding the next token
+  }
+  token_positions[index] = NULL; //dont forget to NULL terminate.
+
+  printf("length of the commands is %i\n", index - 1);
+
+  for (int i = 0; i < index - 1; i++)
+  {
+    printf("token %i is : %s, it is at address %0x \n", i, token_positions[i], token_positions[i]);
+  }
+
+  return token_positions;
+}
+return NULL;
 }
 
 /**
@@ -302,9 +341,8 @@ void shellLoop(void)
   char **args; // to tokenize them as arguments separated by spaces
   int status;  // to tell the shell program whether to terminate shell or not
 
-
   /** TASK 5 **/
-  //write a loop where you do the following: 
+  //write a loop where you do the following:
 
   // 1. print the message prompt
   // 2. clear the buffer and move the output to the console using fflush
@@ -314,18 +352,28 @@ void shellLoop(void)
 
   // 6. free memory location containing the strings of characters
   // 7. free memory location containing char* to the first letter of each word in the input string
-  // 8. check if shellExecuteInput returns 1. If yes, loop back to Step 1 and prompt user with new input. Otherwise, exit the shell. 
-
-
+  // 8. check if shellExecuteInput returns 1. If yes, loop back to Step 1 and prompt user with new input. Otherwise, exit the shell.
 }
 
+////////////////////////////////////////////////////// MAIN REPLACED
 int main(int argc, char **argv)
 {
 
   printf("Shell Run successful. Running now: \n");
 
-  // Run command loop
-  shellLoop();
+  char *line = shellReadLine();
+  printf("The fetched line is : %s \n", line);
 
   return 0;
 }
+
+// int main(int argc, char **argv)
+// {
+
+// 	printf("Shell Run successful. Running now: \n");
+
+// 	// Run command loop
+// 	shellLoop();
+
+// 	return 0;
+// }
